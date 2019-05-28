@@ -1,0 +1,17 @@
+
+filebeat.inputs:
+- type: log 
+  paths:
+    - /opt/tomcat/json-logs/*.log
+  json.keys_under_root: true
+  json.add_error_key: true
+processors:
+- add_fields:
+    fields:
+      environment: 'development'
+      group: 'pi'
+      team: 'pps'
+output.logstash:
+  hosts: ["metrix.jgi.doe.gov:5044"]
+setup.kibana:
+  host: "http://metrix.jgi.doe.gov:5601"
