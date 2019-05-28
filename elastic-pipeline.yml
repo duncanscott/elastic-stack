@@ -1,0 +1,55 @@
+# Sample Logstash configuration for creating a simple
+# Beats -> Logstash -> Elasticsearch pipeline.
+
+input {
+  beats {
+    port => 5044
+  }
+}
+ 
+filter {
+   kv { 
+     target => 'kv'
+     allow_duplicate_values => false
+   }
+   if [web-transaction-id] {
+     if ![kv][web-transaction-id] {
+       mutate {
+         add_field => { "[kv][web-transaction-id]" => "%{[web-transaction-id]}" }
+       }
+     }
+   }
+   if [clarity-process-id] {
+     if ![kv][clarity-process-id] {
+       mutate {
+         add_field => { "[kv][clarity-process-id]" => "%{[clarity-process-id]}" }
+       }
+     }
+   }
+   if [clarity-user-contact-id] {
+     if ![kv][clarity-user-contact-id] {
+       mutate {
+        add_field => { "[kv][clarity-user-contact-id]" => "%{[clarity-user-contact-id]}" }
+      }
+     }
+   }
+}
+
+output {
+#  file {
+#      path => "/home/dnscott/logs/stash.log"
+#  }
+
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+    #user => "elastic"
+    #password => "changeme"
+  }
+  tcp {
+    host => "listener.logz.io"
+    port => 5050
+    codec => json_lines
+  }
+}
+

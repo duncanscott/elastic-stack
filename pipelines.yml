@@ -1,0 +1,15 @@
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+#- pipeline.id: main
+#  path.config: "/etc/logstash/conf.d/*.conf"
+
+- pipeline.id: elastic-1
+  path.config: "/etc/logstash/elastic-pipeline.yml"
+  pipeline.workers: 2
+  queue.type: persisted
+
+#- pipeline.id: stash
+#  path.config: "/etc/logstash/stash-pipeline.yml"
+#  queue.type: persisted
