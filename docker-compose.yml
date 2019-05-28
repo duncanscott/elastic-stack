@@ -1,0 +1,65 @@
+version: '2'
+
+services:
+  api:
+    image: elasticsearch:6.6.2
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - api.dev-elasticsearch-pi-jgi-01.data:/usr/share/elasticsearch/data
+    ports:
+      - 60092:9200
+    networks:
+      - esnet
+  kv:
+    image: elasticsearch:6.6.2
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - kv.dev-elasticsearch-pi-jgi-01.data:/usr/share/elasticsearch/data
+    networks:
+      - esnet
+
+volumes:
+  api.dev-elasticsearch-pi-jgi-01.data:
+    driver: rancher-nfs
+    external: true
+  kv.dev-elasticsearch-pi-jgi-01.data:
+    driver: rancher-nfs
+    external: true
+
+networks:
+  esnet:
